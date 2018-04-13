@@ -99,15 +99,49 @@ const get = function(url) {
   })
 };
 
-get('https://www.google.com.ar/')
-  .then((res) => console.log(res.statusCode))
-  .catch((err) => console.error(err));
+
+function run() {
+  get('https://www.google.com.ar/')
+    .then((res) => console.log(res.statusCode))
+    .catch((err) => console.error(err));
+}
+run()
 ```
 <!-- tmc
 200
 -->
 
-Esta sintaxis se puede hacer aún más linda con async y await.
+Las promesas se pueden encadenar para que una se resuelva con el valor de una anterior.
+
+```js
+const suma = function(a, b) {
+  return new Promise((resolve, reject) => { resolve(a+b) })
+};
+
+const resta = function(a, b) {
+  return new Promise((resolve, reject) => { resolve(a-b) })
+};
+
+function run() {
+  suma(1, 2)
+    .then((res) => {
+      console.log('el resultado de la suma es', res)
+      return resta(res, 5)
+    })
+    .then((res) => {
+      console.log('el resultado de la resta es', res)
+    })
+}
+run()
+```
+<!-- tmc
+el resultado de la suma es 3
+el resultado de la resta es -2
+-->
+
+
+Esta sintaxis se puede hacer aún más linda con async y await. Esto fue agregado recientemente y
+puede no estar disponible en viejas plataformas.
 
 ```js
 const get = function(url) {
@@ -130,18 +164,76 @@ async function run() {
     } catch (err) {
       console.error(err)
     }
-    return "finished"
 }
 
 run()
-  .then((val) => console.log(val))
 
 ```
 <!-- tmc
 200
-finished
 -->
 
-`await` hace implícitamente la parte de `then` y `catch`. La función al ser marcada como `async`
-puede usar `await` (sino tira un error) y automáticamente su valor de retorno es una promesa y no
-el valor retornado directamente.
+Este ejemplo hace exactamente lo mismo que el ejemplo anterior, pero usando la sintaxis nueva.
+
+`await` traduce automáticamente el código que continúa como si fuese código a ser ejecutado en
+el `then` de la Promise.
+
+Sólo se puede llamar a `await` dentro de una función marcada como `async`.
+
+La función al ser `async` hace que su valor de retorno sea automáticamente una Promise, porque
+si hubo una llamada a `await` se necesita que ella hubiese concluido para tener su propio valor.
+
+```js
+async function sumar(a, b) {
+    return a+b
+}
+sumar(1, 2).then((res) => console.log(res))
+```
+<!-- tmc
+3
+-->
+
+También se pueden combinar varias Promise en una sola para esperar a que todas terminen.
+
+```js
+async function sumar(a, b) {
+    return a+b
+}
+async function restar(a, b) {
+    return a-b
+}
+async function esperar(time) {
+    return new Promise((resolve) => setTimeout(() => resolve(), time))
+}
+async function run() {
+    const [suma, resta, _] = await Promise.all([sumar(1, 2), restar(1, 2), esperar(1)])
+    console.log(suma, resta)
+}
+run()
+```
+<!-- tmc
+3 -1
+-->
+
+Y encadenar cosas es más fácil con async/await!
+```js
+const suma = async function(a, b) {
+  return a+b
+};
+
+const resta = async function(a, b) {
+  return a-b
+};
+
+async function run() {
+  const res_suma = await suma(1, 2)
+  console.log('el resultado de la suma es', res_suma)
+  const res_resta = await resta(res_suma, 5)
+  console.log('el resultado de la resta es', res_resta)
+}
+run()
+```
+<!-- tmc
+el resultado de la suma es 3
+el resultado de la resta es -2
+-->
