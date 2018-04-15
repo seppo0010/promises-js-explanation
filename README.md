@@ -91,7 +91,7 @@ const get = function(url) {
     const lib = url.startsWith('https') ? require('https') : require('http');
     const request = lib.get(url, (response) => {
       if (response.statusCode < 200 || response.statusCode > 299) {
-        reject(response);
+        return reject(response);
       }
       resolve(response)
     });
@@ -149,7 +149,7 @@ const get = function(url) {
     const lib = url.startsWith('https') ? require('https') : require('http');
     const request = lib.get(url, (response) => {
       if (response.statusCode < 200 || response.statusCode > 299) {
-        reject(response);
+        return reject(response);
       }
       resolve(response)
     });
