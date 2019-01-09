@@ -45,19 +45,19 @@ var https = {
         var promise = {
             resolved: false,
             value: null,
-            thens: [],
+            callbacks: [],
             resolve: function(value) {
                 this.value = value
                 this.resolved = true
-                for (var i = 0; i < this.thens.length; i++) {
-                    this.thens[i](value)
+                for (var i = 0; i < this.callbacks.length; i++) {
+                    this.callbacks[i](value)
                 }
             },
             then: function(callback) {
                 if (this.resolved) {
                     callback(this.value)
                 } else {
-                    this.thens.push(callback)
+                    this.callbacks.push(callback)
                 }
             }
         }
